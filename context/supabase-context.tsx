@@ -1,4 +1,5 @@
 "use client";
+import { createClient } from "@/lib/supabase-browser";
 import {
   createPagesBrowserClient,
   type SupabaseClient,
@@ -16,7 +17,7 @@ export default function SupabaseProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [supabase] = useState(() => createPagesBrowserClient());
+  const [supabase] = useState(() => createClient());
 
   return (
     <Context.Provider value={{ supabase }}>

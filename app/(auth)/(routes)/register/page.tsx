@@ -17,10 +17,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import supabase from "@/lib/supabase-browser";
+import { useAuth } from "@/context/supabase-auth-context";
 
 const Register = () => {
   const router = useRouter();
+  const { register } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,13 +38,7 @@ const Register = () => {
     try {
       const { email, password } = values;
       if (email && password) {
-        const response = await supabase.auth.signUp({
-          email: email,
-          password: password,
-        });
-        if (response.error) throw response.error;
-        const userId = response.data.user?.id;
-        console.log(userId);
+        const response = await register(email, password);
         router.push("/");
       }
     } catch (error) {

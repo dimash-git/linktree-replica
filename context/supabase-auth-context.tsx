@@ -1,32 +1,24 @@
 "use client";
-
-import { Session, User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect } from "react";
-import useSWR from "swr";
+import { useRouter } from "next/navigation";
+import type { Session, User } from "@supabase/supabase-js";
 import { useSupabase } from "./supabase-context";
 
+import useSWR from "swr";
+
 interface SupabaseAuthContext {
-  user: any;
-  error: any;
-  isLoading: boolean;
-  mutate: any;
-  signOut: () => Promise<void>;
-  signInWithEmail: (
+  logout: () => Promise<void>;
+  loginWithPassword: (
     email: string,
     password: string
-  ) => Promise<{
-    user: User;
-  } | null>;
+  ) => Promise<User | string | null>;
+  register: (email: string, password: string) => Promise<User | string | null>;
 }
 
 const Context = createContext<SupabaseAuthContext>({
-  user: null,
-  error: null,
-  isLoading: true,
-  mutate: null,
-  signOut: async () => {},
-  signInWithEmail: async (email: string, password: string) => null,
+  logout: async () => {},
+  loginWithPassword: async (email: string, password: string) => null,
+  register: async (email: string, password: string) => null,
 });
 
 export default function SupabaseAuthProvider({
@@ -40,38 +32,16 @@ export default function SupabaseAuthProvider({
   const router = useRouter();
   console.log("session", serverSession);
 
-  // Get USER
-  const getUser = async () => {
-    const { data: user, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", serverSession?.user?.id)
-      .single();
-    if (error) {
-      console.log(error);
-      return null;
-    } else {
-      return user;
-    }
-  };
-
-  const {
-    data: user,
-    error,
-    isLoading,
-    mutate,
-  } = useSWR(serverSession ? "profile-context" : null, getUser);
-
   // Sign Out
-  const signOut = async () => {
+  const logout = async () => {
     await supabase.auth.signOut();
     router.push("/login");
   };
 
-  // Sign-In with Email
-  const signInWithEmail = async (email: string, password: string) => {
+  // Sign In with Email
+  const loginWithPassword = async (email: string, password: string) => {
     const {
-      data: { user, session },
+      data: { user },
       error,
     } = await supabase.auth.signInWithPassword({
       email,
@@ -82,7 +52,22 @@ export default function SupabaseAuthProvider({
       return error.message;
     }
 
-    return { user };
+    return user as User;
+  };
+
+  const register = async (email: string, password: string) => {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) {
+      return error.message;
+    }
+
+    return user as User;
   };
 
   // Refresh the Page to Sync Server and Client
@@ -101,12 +86,9 @@ export default function SupabaseAuthProvider({
   }, [router, supabase, serverSession?.access_token]);
 
   const exposed: SupabaseAuthContext = {
-    user,
-    error,
-    isLoading,
-    mutate,
-    signOut,
-    signInWithEmail,
+    logout,
+    loginWithPassword,
+    register,
   };
 
   return <Context.Provider value={exposed}>{children}</Context.Provider>;

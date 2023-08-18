@@ -29,15 +29,16 @@ const Login = () => {
     },
   });
 
-  const { signInWithEmail } = useAuth();
+  const { loginWithPassword } = useAuth();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const { email, password } = values;
       if (email && password) {
-        const response = await signInWithEmail(email, password);
+        const response = await loginWithPassword(email, password);
+        // console.log(response);
 
-        // router.push("/");
+        router.push("/");
       }
     } catch (error) {
       console.log("SIGNUP_ERROR", error);
