@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import supabase from "@/lib/supabase";
+import { useAuth } from "@/context/supabase-auth-context";
 
 const Login = () => {
   const router = useRouter();
@@ -29,18 +29,15 @@ const Login = () => {
     },
   });
 
+  const { signInWithEmail } = useAuth();
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const { email, password } = values;
       if (email && password) {
-        const response = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password,
-        });
-        if (response.error) throw response.error;
-        const userId = response.data.user?.id;
-        console.log(userId);
-        router.push("/");
+        const response = await signInWithEmail(email, password);
+
+        // router.push("/");
       }
     } catch (error) {
       console.log("SIGNUP_ERROR", error);

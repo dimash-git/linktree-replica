@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import supabase from "@/lib/supabase";
+import supabase from "@/lib/supabase-browser";
 
 const Register = () => {
   const router = useRouter();
