@@ -13,19 +13,27 @@ export async function POST(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { file }: { file: File } = await req.json();
-
   const { user } = session;
 
-  const { data, error } = await supabase.storage
-    .from("profile_pictures")
-    .upload(`${user.id}/${file.name}`, file, { upsert: true });
+  // const { image }: { image: File } = await req.json();
 
-  if (error) {
-    return new NextResponse(`Error updating Supabase: ${error.message}`, {
-      status: 500,
-    });
-  }
+  const res = await req.json();
+  console.log("req:", req);
 
-  return NextResponse.json(data);
+  // const { data, error } = await supabase.storage
+  //   .from("profile_pictures")
+  //   .upload(`${user.id}/${image.name}`, image, { upsert: true });
+
+  // if (error) {
+  //   return new NextResponse(
+  //     `Error updating Supabase (Storage): ${error.message}`,
+  //     {
+  //       status: 500,
+  //     }
+  //   );
+  // }
+
+  // console.log("image:", image);
+
+  return NextResponse.json({});
 }

@@ -47,9 +47,12 @@ export async function GET(req: Request) {
   const { data, error } = await supabase.from("links").select();
 
   if (error) {
-    return new NextResponse(`Error updating Supabase: ${error.details}`, {
-      status: parseInt(error.code),
-    });
+    return new NextResponse(
+      `Error updating Supabase (Links): ${error.details}`,
+      {
+        status: parseInt(error.code),
+      }
+    );
   }
   return NextResponse.json(data);
 }
