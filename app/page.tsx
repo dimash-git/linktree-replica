@@ -5,12 +5,12 @@ import axios from "axios";
 
 export default function Home() {
   const handleClick = async () => {
-    const { data } = await axios.post("/api/links", {
+    const response = await axios.post("/api/links", {
       title: "asd",
-      link: "https://google.com",
+      url: "https://google.com",
       user_id: "123",
     });
-    console.log(data);
+    console.log(response);
   };
   return (
     <main>

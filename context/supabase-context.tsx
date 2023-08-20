@@ -1,10 +1,7 @@
 "use client";
 import { createClient } from "@/lib/supabase-browser";
-import {
-  createPagesBrowserClient,
-  type SupabaseClient,
-} from "@supabase/auth-helpers-nextjs";
-import { createContext, useContext, useEffect, useState } from "react";
+import { type SupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createContext, useContext, useState } from "react";
 
 type SupabaseContext = {
   supabase: SupabaseClient;
@@ -12,6 +9,7 @@ type SupabaseContext = {
 
 const Context = createContext<SupabaseContext | undefined>(undefined);
 
+// Only One Browser Client for whole app
 export default function SupabaseProvider({
   children,
 }: {

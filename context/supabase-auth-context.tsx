@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import type { Session, User } from "@supabase/supabase-js";
 import { useSupabase } from "./supabase-context";
 
-import useSWR from "swr";
-
 interface SupabaseAuthContext {
   logout: () => Promise<void>;
   loginWithPassword: (
@@ -28,9 +26,8 @@ export default function SupabaseAuthProvider({
   serverSession?: Session | null;
   children: React.ReactNode;
 }) {
-  const { supabase } = useSupabase();
   const router = useRouter();
-  console.log("session", serverSession);
+  const { supabase } = useSupabase();
 
   // Sign Out
   const logout = async () => {
@@ -69,6 +66,14 @@ export default function SupabaseAuthProvider({
 
     return user as User;
   };
+
+  useEffect(() => {
+    const getSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+    };
+  }, [supabase.auth]);
 
   // Refresh the Page to Sync Server and Client
   useEffect(() => {
