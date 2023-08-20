@@ -10,4 +10,8 @@ const addLinkFormSchema = z.object({
     .url("It is not a valid URL"),
 });
 
-export { addLinkFormSchema };
+const profileFormSchema = z.object({
+  image: z.instanceof(File),
+});
+
+export { addLinkFormSchema, profileFormSchema };

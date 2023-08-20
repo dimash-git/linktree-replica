@@ -1,6 +1,6 @@
 "use client";
 
-import AddLinkForm from "@/components/links/add-link-form";
+import AddLinkForm from "@/components/forms/add-link-form";
 import MobSidebar from "@/components/mob-sidebar";
 import { useAuth } from "@/context/supabase-auth-context";
 import axios from "axios";

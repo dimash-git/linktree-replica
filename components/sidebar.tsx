@@ -8,9 +8,13 @@ const links = [
 
 const Sidebar = () => {
   return (
-    <div className="flex flex-col gap-4 mt-8">
+    <div className="flex flex-col gap-6 mt-8">
       {links.map((link, idx) => (
-        <Link href={link.url} key={idx}>
+        <Link
+          href={link.url}
+          key={idx}
+          className="hover:text-slate-500 transition-all"
+        >
           {link.name}
         </Link>
       ))}
