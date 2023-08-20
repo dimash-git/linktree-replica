@@ -23,7 +23,10 @@ export async function POST(req: Request) {
     user_id,
   });
 
-  if (error) return new NextResponse(error.message, { status: 500 });
+  if (error)
+    return new NextResponse(`Error updating Supabase: ${error.details}`, {
+      status: parseInt(error.code),
+    });
 
   return NextResponse.json(data);
 }

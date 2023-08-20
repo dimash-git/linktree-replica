@@ -10,7 +10,7 @@ type SupabaseContext = {
 const Context = createContext<SupabaseContext | undefined>(undefined);
 
 // Only One Browser Client for whole app
-export default function SupabaseProvider({
+export default function SupabaseClientProvider({
   children,
 }: {
   children: React.ReactNode;

@@ -1,33 +1,35 @@
 "use client";
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Session, User } from "@supabase/supabase-js";
-import { useSupabase } from "./supabase-context";
+import { useSupabase } from "./supabase-client-context";
 
 interface SupabaseAuthContext {
+  user: User | undefined;
   logout: () => Promise<void>;
   loginWithPassword: (
     email: string,
     password: string
-  ) => Promise<User | string | null>;
-  register: (email: string, password: string) => Promise<User | string | null>;
+  ) => Promise<string | null>;
+  register: (email: string, password: string) => Promise<string | null>;
 }
 
 const Context = createContext<SupabaseAuthContext>({
   logout: async () => {},
   loginWithPassword: async (email: string, password: string) => null,
   register: async (email: string, password: string) => null,
+  user: undefined,
 });
 
 export default function SupabaseAuthProvider({
-  serverSession,
   children,
 }: {
-  serverSession?: Session | null;
   children: React.ReactNode;
 }) {
   const router = useRouter();
   const { supabase } = useSupabase();
+
+  const [session, setSession] = useState<Session | null>();
 
   // Sign Out
   const logout = async () => {
@@ -37,10 +39,7 @@ export default function SupabaseAuthProvider({
 
   // Sign In with Email
   const loginWithPassword = async (email: string, password: string) => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -48,23 +47,18 @@ export default function SupabaseAuthProvider({
     if (error) {
       return error.message;
     }
-
-    return user as User;
+    return null;
   };
 
   const register = async (email: string, password: string) => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
     if (error) {
       return error.message;
     }
-
-    return user as User;
+    return null;
   };
 
   useEffect(() => {
@@ -72,7 +66,11 @@ export default function SupabaseAuthProvider({
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
+      if (session) setSession(session);
     };
+
+    getSession();
   }, [supabase.auth]);
 
   // Refresh the Page to Sync Server and Client
@@ -80,7 +78,7 @@ export default function SupabaseAuthProvider({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_, session) => {
-      if (session?.access_token !== serverSession?.access_token) {
+      if (session?.access_token !== session?.access_token) {
         router.refresh();
       }
     });
@@ -88,12 +86,17 @@ export default function SupabaseAuthProvider({
     return () => {
       subscription.unsubscribe();
     };
-  }, [router, supabase, serverSession?.access_token]);
+  }, [router, supabase, session?.access_token]);
+
+  useEffect(() => {
+    console.log("session", session);
+  }, [session]);
 
   const exposed: SupabaseAuthContext = {
     logout,
     loginWithPassword,
     register,
+    user: session?.user,
   };
 
   return <Context.Provider value={exposed}>{children}</Context.Provider>;

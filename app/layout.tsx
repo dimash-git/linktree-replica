@@ -1,9 +1,9 @@
-import SupabaseProvider from "@/context/supabase-context";
+import SupabaseProvider from "@/context/supabase-client-context";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import SupabaseAuthProvider from "@/context/supabase-auth-context";
-import { createClient } from "@/lib/supabase-server";
+import SupabaseClientProvider from "@/context/supabase-client-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,18 +17,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SupabaseProvider>
-          <SupabaseAuthProvider serverSession={session}>
-            {children}
-          </SupabaseAuthProvider>
-        </SupabaseProvider>
+        <SupabaseClientProvider>
+          <SupabaseAuthProvider>{children}</SupabaseAuthProvider>
+        </SupabaseClientProvider>
       </body>
     </html>
   );
