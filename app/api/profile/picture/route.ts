@@ -1,7 +1,6 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { decode } from "base64-arraybuffer";
 
 export async function POST(req: Request) {
   const supabase = createRouteHandlerClient({ cookies });
@@ -14,23 +13,19 @@ export async function POST(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  // const { image }: { image: File } = await req.json();
-
   const formData = await req.formData();
-  const image = formData.get("image");
+  const imageBlob = formData.get("image_blob");
   const imageName = formData.get("image_name");
 
-  if (!image) {
+  if (!imageBlob) {
     return new Response("Image not provided", { status: 500 });
   }
-
-  console.log("image,", image.toString());
 
   const { user } = session;
 
   const { data, error } = await supabase.storage
     .from("profile_pictures")
-    .upload(`${user.id}/${imageName}`, image, {
+    .upload(`${user.id}/${imageName}`, imageBlob, {
       upsert: true,
     });
 
